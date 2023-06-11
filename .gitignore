@@ -1,0 +1,15 @@
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE files
+.vscode/
+
+# Miscellaneous
+.DS_Store
