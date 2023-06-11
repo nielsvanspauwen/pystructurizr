@@ -5,6 +5,7 @@ import sys
 import asyncio
 import os
 import shutil
+import subprocess
 from .cli_helper import generate_diagram_code, generate_diagram_code_in_child_process
 from .cli_watcher import observe_modules
 
@@ -54,6 +55,8 @@ def dev(view):
 
     async def observe_loop():
         await async_behavior()
+        click.echo("Launching webserver...")
+        subprocess.Popen(f"httpwatcher --root {tmp_folder} --watch {tmp_folder}", shell=True)
         await observe_modules(['example.users', 'example.chatsystem', 'example.containerview', 'example.workspace', 'example', 'pystructurizr.dsl'], async_behavior)
 
     asyncio.run(observe_loop())
