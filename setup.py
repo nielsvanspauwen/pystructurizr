@@ -10,6 +10,7 @@ setup(
     author='Niels Vanspauwen',
     author_email='niels.vanspauwen@gmail.com',
     license='MIT',
+    url='https://github.com/nielsvanspauwen/pystructurizr',
     data_files=[('', ['LICENSE.txt'])],
     packages=find_packages(),
     install_requires=requirements,
