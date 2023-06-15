@@ -1,4 +1,4 @@
-from pystructurizr.dsl import Workspace, Dumper
+from pystructurizr.dsl import Workspace
 
 from example.users import users, customer, support_agent
 from example.chatsystem import chat, chat_widget, slack
