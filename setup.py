@@ -9,6 +9,8 @@ setup(
     description='A Python DSL inspired by Structurizr, intended for generating C4 diagrams',
     author='Niels Vanspauwen',
     author_email='niels.vanspauwen@gmail.com',
+    license='MIT',
+    data_files=[('', ['LICENSE.txt'])],
     packages=find_packages(),
     install_requires=requirements,
     classifiers=[
