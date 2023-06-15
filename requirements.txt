@@ -4,3 +4,4 @@ httpx
 aiofiles
 httpwatcher
 google-cloud-storage
+boto3

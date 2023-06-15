@@ -47,7 +47,6 @@ async def generate_svg(diagram_code, tmp_folder):
     svg_file_path = f"{tmp_folder}/diagram.svg"
     async with aiofiles.open(svg_file_path, "w") as f:
         await f.write(resp.text)
-        print(f"Updated SVG in {tmp_folder}")
 
     return svg_file_path
 

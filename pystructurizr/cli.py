@@ -10,6 +10,7 @@ from google.cloud import storage
 from google.cloud.exceptions import GoogleCloudError
 from .cli_helper import generate_diagram_code, generate_diagram_code_in_child_process, generate_svg, ensure_tmp_folder_exists
 from .cli_watcher import observe_modules
+from .cloudstorage import create_cloud_storage, CloudStorage
 
 
 
@@ -58,26 +59,23 @@ def dev(view):
 @click.option('--object-name', prompt='Name of the object on Google Cloud Storage',
               help='The name of the object to use on Google Cloud Storage.')
 def build(view, gcs_credentials, bucket_name, object_name):
-    click.echo(f"Generating view {view} and uploading to cloud storage...")
-    
     async def async_behavior():
-        print("Generating diagram...")
+        # Generate diagram
         diagram_code = generate_diagram_code(view)
         tmp_folder = ensure_tmp_folder_exists()
+
+        # Generate SVG
         svg_file_path = await generate_svg(diagram_code, tmp_folder)
+
+        # Upload it to the requested cloud storage provider
         try:
-            print(f"Uploading {svg_file_path}...")
-            gcs_client = storage.Client.from_service_account_json(gcs_credentials)
-            gcs_bucket = gcs_client.get_bucket(bucket_name)
-            gcs_blob = gcs_bucket.blob(object_name)
-            gcs_blob.upload_from_filename(svg_file_path)
-            svg_file_url = f"https://storage.googleapis.com/{bucket_name}/{object_name}"
-            print("Done! You can get the SVG file at:")
+            cloud_storage = create_cloud_storage(CloudStorage.Provider.GCS, gcs_credentials)
+            svg_file_url = cloud_storage.upload_file(svg_file_path, bucket_name, object_name)
             print(svg_file_url)
         except GoogleCloudError as e:
             print("An error occurred while uploading the file to Google Cloud Storage:")
             print(e)
-        
+
     asyncio.run(async_behavior())
 
 
