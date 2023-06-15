@@ -1,13 +1,8 @@
-import aiofiles
 import click
-import httpx
-import sys
 import asyncio
 import os
 import shutil
 import subprocess
-from google.cloud import storage
-from google.cloud.exceptions import GoogleCloudError
 from .cli_helper import generate_diagram_code, generate_diagram_code_in_child_process, generate_svg, ensure_tmp_folder_exists
 from .cli_watcher import observe_modules
 from .cloudstorage import create_cloud_storage, CloudStorage
@@ -68,14 +63,10 @@ def build(view, gcs_credentials, bucket_name, object_name):
         svg_file_path = await generate_svg(diagram_code, tmp_folder)
 
         # Upload it to the requested cloud storage provider
-        try:
-            cloud_storage = create_cloud_storage(CloudStorage.Provider.GCS, gcs_credentials)
-            svg_file_url = cloud_storage.upload_file(svg_file_path, bucket_name, object_name)
-            print(svg_file_url)
-        except GoogleCloudError as e:
-            print("An error occurred while uploading the file to Google Cloud Storage:")
-            print(e)
-
+        cloud_storage = create_cloud_storage(CloudStorage.Provider.GCS, gcs_credentials)
+        svg_file_url = cloud_storage.upload_file(svg_file_path, bucket_name, object_name)
+        print(svg_file_url)
+    
     asyncio.run(async_behavior())
 
 

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-import boto3
 import json
 from typing import Dict
 
@@ -21,15 +20,21 @@ class GCS(CloudStorage):
 
     def upload_file(self, file_path: str, bucket_name: str, object_name: str) -> str:
         from google.cloud import storage
-        gcs_client = storage.Client.from_service_account_json(self.gcs_credentials)
-        gcs_bucket = gcs_client.get_bucket(bucket_name)
-        gcs_blob = gcs_bucket.blob(object_name)
-        gcs_blob.upload_from_filename(file_path)
-        return f"https://storage.googleapis.com/{bucket_name}/{object_name}"
+        from google.cloud.exceptions import GoogleCloudError
+        try:
+            gcs_client = storage.Client.from_service_account_json(self.gcs_credentials)
+            gcs_bucket = gcs_client.get_bucket(bucket_name)
+            gcs_blob = gcs_bucket.blob(object_name)
+            gcs_blob.upload_from_filename(file_path)
+            return f"https://storage.googleapis.com/{bucket_name}/{object_name}"
+        except GoogleCloudError as e:
+            print("An error occurred while uploading the file to Google Cloud Storage:")
+            print(e)
 
 
 class S3(CloudStorage):
     def __init__(self, credentials_file: str):
+        import boto3
         self.credentials = self._load_credentials(credentials_file)
         self.client = boto3.client(
             "s3",
