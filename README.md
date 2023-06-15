@@ -88,5 +88,5 @@ MIT License
 
 ## Acknowledgements
 
-[Structurizr](https://structurizr.com/) 
-[Kroki](https://kroki.io/)
+- [Structurizr](https://structurizr.com/) 
+- [Kroki](https://kroki.io/)
