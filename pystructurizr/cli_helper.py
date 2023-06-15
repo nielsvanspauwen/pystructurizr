@@ -9,10 +9,7 @@ import sys
 import os
 
 
-# This is useally run within the same process as cli.py
-# But for the 'dev' command, we run it as a separate process, so it can be run
-# repeatedly within the same dev session whenever the view changes.
-def generate_diagram_code(view):
+def generate_diagram_code(view: str) -> str:
     try:
         module = importlib.import_module(view)
         code = module.workspace.dump()
@@ -22,7 +19,8 @@ def generate_diagram_code(view):
     except AttributeError:
         raise click.BadParameter("Non-compliant view file: make sure it exports the PyStructurizr workspace.")
 
-def generate_diagram_code_in_child_process(view):
+
+def generate_diagram_code_in_child_process(view: str) -> str:
     def run_child_process():
         # Run a separate Python script as a child process
         output = subprocess.check_output([sys.executable, "-m", "pystructurizr.cli", "dump", "--view", view])
@@ -33,7 +31,7 @@ def generate_diagram_code_in_child_process(view):
     return child_output
 
 
-async def generate_svg(diagram_code, tmp_folder):
+async def generate_svg(diagram_code: str, tmp_folder: str) -> str:
     url = f"https://kroki.io/structurizr/svg"
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, data=diagram_code)
@@ -51,7 +49,7 @@ async def generate_svg(diagram_code, tmp_folder):
     return svg_file_path
 
 
-def ensure_tmp_folder_exists():
+def ensure_tmp_folder_exists() -> str:
     tmp_folder = "/tmp/pystructurizr"
     os.makedirs(tmp_folder, exist_ok=True)
     return tmp_folder
