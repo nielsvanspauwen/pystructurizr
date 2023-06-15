@@ -3,3 +3,4 @@ click
 httpx
 aiofiles
 httpwatcher
+google-cloud-storage

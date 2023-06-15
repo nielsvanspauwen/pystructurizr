@@ -13,3 +13,6 @@ build/
 
 # Miscellaneous
 .DS_Store
+
+# Credentials
+gcs_credentials.json
