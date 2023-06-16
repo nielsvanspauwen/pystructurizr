@@ -1,33 +1,20 @@
-Steps:
-- Maak een repo in Product.Hydra, met daarin de PyStructurizr code
-- Iedereen maakt zijn models mbv PyStructurizr
-- En er is een workspace.py die alles samenbrengt
-- Voor elke C4 view die we willen, is er een PyStructurizr file die die view definieert en omzet naar Structurizr DSL. Die DSL wordt met een POST request naar kroki.io gestuurd waarvan we dan gelijk de svg downloaden en uploaden naar S3 storage.
-- CI pipeline gaat alle view files executen, zodat bij elke wijziging alle svg's gedownload worden
-- In de wiki zetten we images die de SVG url van een diagram gebruiken
-- Op die manier is de wiki altijd up to date
+This example models a simplified live chat support system, consisting of a chat widget on a website. Customers can type their message there, which gets routed to the company's Slack. 
 
+The example consists out of the following files:
+- `users.py`: models all people that interact with the system
+- `chatsystem.py`: models the software system, containers and components for the chatsystem
 
-Tijdens het schrijven van diagram code is het niet handig (en niet wenselijk) om telkens naar S3 te moeten gaan.
-Daarom moet er een live previes / hot reload mode zijn. We draaien een lokale webserver die een statische html pagina served
-met daarin lokaal gebufferde SVG file. 
-Dat kan met twee packages:
-1. https://github.com/Pylons/hupper
-dit zorgt dat het view script bij elke save van de python files opnieuw gedraaid wordt en de SVG gedownload wordt (telkens naar dezelfde /tmp/<somefolder>/<viewfile>.svg file schrijven)
-2. https://github.com/thanethomson/httpwatcher
-served static files en doet een automatische reload als er iets wijzigt. Best in een aparte /tmp/<somefolder> folder runnen
+For a more complex system, you could imagine multiple teams that each model their own software system, but share the Person definitions and potentially shared infrastructure containers.
 
+The `workspace.py` file brings the different models and software systems together, and adds toplevel relationships between them.
 
-Ik ben een CLI aan het maken, waarmee je live preview als volgt kan krijgen:
-$ python3 -m pystructurizr.cli dev --view example.componentview
-(eenmaal we setuptools toegevoegd hebben, kan "python3 -m pystructurizr.cli" vervangen worden door "pystructurizr")
+Finally, multipe view files (`componentview.py`, `containerview.py`, `systemlandscapeview.py`) describe which views to generate an SVG for.
 
-Nog te doen: vanuit dat 'dev' command automatisch httpserver starten:
-httpwatcher --root /tmp/pystructurizr --watch /tmp/pystructurizr
-
-en zorgen dat als de .py files getouched worden, automatisch de SVG geupdate wordt
-
-Andere commands:
-- dump: print generated SVG to console
-- build: upload generated SVG to S3
-
+To run the example, you would for instance do:
+```
+$ pystructurizr dev --view example.componentview
+```
+or 
+```
+$ pystructurizr build --view example.containerview --gcs-credentials <...> --bucket-name <...> --object-name <...>
+```
