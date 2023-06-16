@@ -3,10 +3,15 @@ from setuptools import setup, find_packages
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name='pystructurizr',
     version='0.1.0',
     description='A Python DSL inspired by Structurizr, intended for generating C4 diagrams',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author='Niels Vanspauwen',
     author_email='niels.vanspauwen@gmail.com',
     license='MIT',
