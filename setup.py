@@ -13,6 +13,9 @@ setup(
     url='https://github.com/nielsvanspauwen/pystructurizr',
     data_files=[('', ['LICENSE.txt'])],
     packages=find_packages(),
+    package_data={
+        'pystructurizr': ['index.html'],
+    },
     install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
