@@ -7,13 +7,16 @@ import click
 import httpx
 import sys
 import os
+import json
 
 
 def generate_diagram_code(view: str) -> str:
     try:
+        initial_modules = set(sys.modules.keys())
         module = importlib.import_module(view)
+        imported_modules = set(sys.modules.keys()) - initial_modules
         code = module.workspace.dump()
-        return code
+        return code, imported_modules
     except ModuleNotFoundError:
         raise click.BadParameter("Invalid view name. Make sure you don't include the .py file extension.")
     except AttributeError:
@@ -23,12 +26,12 @@ def generate_diagram_code(view: str) -> str:
 def generate_diagram_code_in_child_process(view: str) -> str:
     def run_child_process():
         # Run a separate Python script as a child process
-        output = subprocess.check_output([sys.executable, "-m", "pystructurizr.cli", "dump", "--view", view])
+        output = subprocess.check_output([sys.executable, "-m", "pystructurizr.cli", "dump", "--as-json", "--view", view])
         return output.decode().strip()
 
     # Run the child process and capture its output
     child_output = run_child_process()
-    return child_output
+    return json.loads(child_output)
 
 
 async def generate_svg(diagram_code: str, tmp_folder: str) -> str:

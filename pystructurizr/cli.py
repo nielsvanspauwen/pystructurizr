@@ -3,6 +3,7 @@ import asyncio
 import os
 import shutil
 import subprocess
+import json
 from .cli_helper import generate_diagram_code, generate_diagram_code_in_child_process, generate_svg, ensure_tmp_folder_exists
 from .cli_watcher import observe_modules
 from .cloudstorage import create_cloud_storage, CloudStorage
@@ -12,9 +13,17 @@ from .cloudstorage import create_cloud_storage, CloudStorage
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. example.componentview)',
               help='The view file to generate.')
-def dump(view):
-    diagram_code = generate_diagram_code(view)
-    click.echo(diagram_code)
+@click.option('--as-json', is_flag=True, default=False, 
+              help='Dumps the generated code and the imported modules as a json object')
+def dump(view, as_json):
+    diagram_code, imported_modules = generate_diagram_code(view)
+    if as_json:
+        print(json.dumps({
+            "code": diagram_code,
+            "imported_modules": list(imported_modules)
+        }))
+    else:
+        print(diagram_code)
 
 
 
@@ -31,14 +40,15 @@ def dev(view):
 
     async def async_behavior():
         print("Generating diagram...")
-        diagram_code = generate_diagram_code_in_child_process(view)
-        await generate_svg(diagram_code, tmp_folder)
+        result = generate_diagram_code_in_child_process(view)
+        await generate_svg(result['code'], tmp_folder)
+        return result['imported_modules']
 
     async def observe_loop():
-        await async_behavior()
+        modules_to_watch = await async_behavior()
         click.echo("Launching webserver...")
         subprocess.Popen(f"httpwatcher --root {tmp_folder} --watch {tmp_folder}", shell=True)
-        await observe_modules(['example.users', 'example.chatsystem', 'example.containerview', 'example.workspace', 'example', 'pystructurizr.dsl'], async_behavior)
+        await observe_modules(modules_to_watch, async_behavior)
 
     asyncio.run(observe_loop())
 

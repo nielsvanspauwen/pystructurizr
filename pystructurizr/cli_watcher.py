@@ -43,7 +43,8 @@ async def observe_modules(modules_to_monitor, on_modified_callback):
 
     try:
         # Keep the observer running until interrupted
-        print(f"{formatted_timestamp()}: Monitoring for file changes...")
+        print(f"{formatted_timestamp()}: Monitoring for file changes in following modules:")
+        print(modules_to_monitor)
         while True:
             time.sleep(1)
             if bool(event_handler.modified_modules):
