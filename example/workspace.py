@@ -1,14 +1,15 @@
 from pystructurizr.dsl import Workspace
 
-from example.users import users, customer, support_agent
-from example.chatsystem import chat, chat_widget, slack
+from example.users import users
+from example.chatsystem import chat
+from example.analysissystem import analytics
 
 workspace = Workspace()
 workspace.Model(users)
 workspace.Model(chat)
+workspace.Model(analytics)
 
-customer.uses(chat_widget, "Initiates conversations", "chat widget")
-support_agent.uses(slack, "Responds to customer requests", "Slack")
+analytics.uses(chat, "Derives insights from")
 
 workspace.Styles(
     {"tag": "Person", "background": "#08427b", "color": "#ffffff"},
