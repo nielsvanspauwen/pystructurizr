@@ -56,8 +56,8 @@ class Dumper:
 class Element:
     def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
         self.name = name
-        self.description = description
-        self.technology = technology
+        self.description = description if description else ""
+        self.technology = technology if technology else ""
         self.tags = tags if tags else []
         self.relationships = []
         self.instname = Identifier.make_identifier(name)
@@ -210,8 +210,8 @@ class Relationship:
     def __init__(self, source: Element, destination: Element, description: Optional[str]=None, technology: Optional[str]=None):
         self.source = source
         self.destination = destination
-        self.description = description
-        self.technology = technology
+        self.description = description if description else "" 
+        self.technology = technology if technology else ""
 
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.source.instname} -> {self.destination.instname} "{self.description}" "{self.technology}"')
@@ -232,11 +232,13 @@ class View:
         self.includes = []
         self.excludes = []
 
-    def include(self, element: Element) -> None:
+    def include(self, element: Element) -> 'View':
         self.includes.append(element)
+        return self
         
-    def exclude(self, element: Element) -> None:
+    def exclude(self, element: Element) -> 'View':
         self.excludes.append(element)
+        return self
 
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.viewkind.value} {self.element.instname if self.element else ""} {{')
@@ -245,9 +247,9 @@ class View:
             dumper.add(f'description "{self.description}"')
         dumper.add('include *')
         for include in self.includes:
-            dumper.add(f'include {include}')
+            dumper.add(f'include {include.instname}')
         for exclude in self.excludes:
-            dumper.add(f'exclude {exclude}')
+            dumper.add(f'exclude {exclude.instname}')
         dumper.add('autoLayout')
         dumper.outdent()
         dumper.add(f'}}')
