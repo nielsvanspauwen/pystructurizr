@@ -1,0 +1,54 @@
+workspace {
+  model {
+    customer = Person "Customer" "A user of our website." {
+    }
+    support_agent = Person "Support Agent" "Handles customer queries." {
+    }
+    chatsystem = SoftwareSystem "ChatSystem" "Provides a platform for customer support." {
+      chatwidget = Container "ChatWidget" "Embeddable chat widget for real-time customer support." {
+        technology "JavaScript"
+      }
+      chatserver = Container "ChatServer" "Handles message routing and storage." {
+        technology "Node.js"
+        messagerouter = Component "MessageRouter" "Routes messages between users." {
+          technology "Node.js"
+        }
+        messagestore = Component "MessageStore" "Stores chat history." {
+          technology "MongoDB"
+        }
+      }
+    }
+    slack = SoftwareSystem "Slack" "Third party business chat application" {
+    }
+    customer -> chatwidget "Initiates conversations" "chat widget"
+    support_agent -> slack "Responds to customer requests" "Slack"
+    chatwidget -> chatserver "Sends/receives messages" "xmpp"
+    chatserver -> slack "Integrates with" "None"
+    messagerouter -> messagestore "Stores messages" "None"
+  }
+  views {
+    systemLandscape  {
+      description "The system-level view of the chat support system."
+      include *
+      autoLayout
+    }
+    styles {
+      element "Person" {
+        background "#08427b"
+        color "#ffffff"
+      }
+      element "Software System" {
+        background "#728da1"
+        color "#000000"
+      }
+      element "Container" {
+        background "#728da1"
+        color "#000000"
+      }
+      element "Component" {
+        background "#728da1"
+        color "#000000"
+      }
+    }
+  }
+}
