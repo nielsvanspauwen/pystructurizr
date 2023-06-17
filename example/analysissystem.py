@@ -5,7 +5,7 @@ from .users import analyst
 analytics = Model("Analytics")
 gpt = analytics.SoftwareSystem("OpenAI GPT-4")
 analysis_system = analytics.SoftwareSystem("Sentiment Analysis and Statistics System", "Provides insights to the business about support load, quality and customer sentiment, based on chat messages.")
-sentiment_engine = analysis_system.Container("Sentiment Analysis Engine", "Analyzes the sentiment of customer messages.", technology="GPT-3")
+sentiment_engine = analysis_system.Container("Sentiment Analysis Engine", "Analyzes the sentiment of customer messages.", technology="GPT-4")
 stats_compiler = analysis_system.Container("Statistics Compiler", "Analyzes the content of customer messages to identify the products/features most questioned about.", technology="Python")
 report_builder = analysis_system.Container("Report Builder", "Combines stats and sentiments into human readable reports", technology="Python")
 
