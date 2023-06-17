@@ -6,7 +6,7 @@ chat_system = chat.SoftwareSystem("ChatSystem", "Provides a platform for custome
 chat_widget = chat_system.Container("ChatWidget", "Embeddable chat widget for real-time customer support.", technology="JavaScript")
 chat_server = chat_system.Container("ChatServer", "Handles message routing and storage.", technology="Node.js")
 message_router = chat_server.Component("MessageRouter", "Routes messages between users.", technology="Node.js")
-message_store = chat_server.Component("MessageStore", "Stores chat history.", technology="MongoDB")
+message_store = chat_server.Component("MessageStore", "Stores chat history.", technology="MongoDB", tags=["database"])
 slack = chat.SoftwareSystem("Slack", "Third party business chat application")
 
 chat_widget.uses(chat_server, "Sends/receives messages", technology="xmpp")
