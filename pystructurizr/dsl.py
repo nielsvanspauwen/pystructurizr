@@ -1,9 +1,10 @@
-import re
 import keyword
+import re
 from enum import Enum
 from typing import List, Optional
 
 
+# pylint: disable=too-few-public-methods
 class Identifier:
     counter = {}
 
@@ -29,25 +30,23 @@ class Identifier:
             identifier = f"{identifier}_{Identifier.counter[identifier]}"
         else:
             Identifier.counter[identifier] = 1
-        
+
         return identifier
-    
+
 
 class Dumper:
     def __init__(self):
         self.level = 0
         self.lines = []
 
-    def add(self, s: str) -> None:
-        self.lines.append(f'{"  " * self.level}{s}')
+    def add(self, txt: str) -> None:
+        self.lines.append(f'{"  " * self.level}{txt}')
 
     def indent(self) -> None:
         self.level += 1
 
     def outdent(self):
-        self.level -= 1
-        if self.level < 0:
-            self.level = 0
+        self.level = max(self.level - 1, 0)
 
     def result(self) -> str:
         return "\n".join(self.lines)
@@ -66,7 +65,7 @@ class Element:
         relationship = Relationship(self, destination, description, technology)
         self.relationships.append(relationship)
         return relationship
-    
+
     def dump(self, dumper: Dumper) -> None:
         raise NotImplementedError("This method must be implemented in a subclass.")
 
@@ -75,9 +74,6 @@ class Element:
 
 
 class Person(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
-        super().__init__(name, description, technology, tags)
-
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = Person "{self.name}" "{self.description}" {{')
         dumper.indent()
@@ -86,7 +82,7 @@ class Person(Element):
         if self.tags:
             dumper.add(f'tags "{", ".join(self.tags)}"')
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
@@ -94,9 +90,6 @@ class Person(Element):
 
 
 class Component(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
-        super().__init__(name, description, technology, tags)
-
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = Component "{self.name}" "{self.description}" {{')
         dumper.indent()
@@ -105,7 +98,7 @@ class Component(Element):
         if self.tags:
             dumper.add(f'tags "{", ".join(self.tags)}"')
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
@@ -117,6 +110,7 @@ class Container(Element):
         super().__init__(name, description, technology, tags)
         self.components = []
 
+    # pylint: disable=invalid-name
     def Component(self, *args, **kwargs) -> Component:
         if args and isinstance(args[0], Component):
             component = args[0]
@@ -135,7 +129,7 @@ class Container(Element):
         for component in self.components:
             component.dump(dumper)
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
@@ -149,6 +143,7 @@ class SoftwareSystem(Element):
         super().__init__(name, description, technology, tags)
         self.containers = []
 
+    # pylint: disable=invalid-name
     def Container(self, *args, **kwargs) -> Container:
         if args and isinstance(args[0], Container):
             container = args[0]
@@ -167,7 +162,7 @@ class SoftwareSystem(Element):
         for container in self.containers:
             container.dump(dumper)
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
@@ -181,6 +176,7 @@ class Model(Element):
         super().__init__(name)
         self.elements = []
 
+    # pylint: disable=invalid-name
     def Person(self, *args, **kwargs) -> Person:
         if args and isinstance(args[0], Person):
             person = args[0]
@@ -189,6 +185,7 @@ class Model(Element):
         self.elements.append(person)
         return person
 
+    # pylint: disable=invalid-name
     def SoftwareSystem(self, *args, **kwargs) -> SoftwareSystem:
         if args and isinstance(args[0], SoftwareSystem):
             system = args[0]
@@ -210,7 +207,7 @@ class Relationship:
     def __init__(self, source: Element, destination: Element, description: Optional[str]=None, technology: Optional[str]=None):
         self.source = source
         self.destination = destination
-        self.description = description if description else "" 
+        self.description = description if description else ""
         self.technology = technology if technology else ""
 
     def dump(self, dumper: Dumper) -> None:
@@ -235,7 +232,7 @@ class View:
     def include(self, element: Element) -> 'View':
         self.includes.append(element)
         return self
-        
+
     def exclude(self, element: Element) -> 'View':
         self.excludes.append(element)
         return self
@@ -252,22 +249,22 @@ class View:
             dumper.add(f'exclude {exclude.instname}')
         dumper.add('autoLayout')
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
 
 class Style:
-    def __init__(self, map: dict[str, str]):
-        self.map = map
+    def __init__(self, style_map: dict[str, str]):
+        self.map = style_map
 
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'element "{self.map["tag"]}" {{')
         dumper.indent()
-        for k, v in self.map.items():
-            if k == "tag":
+        for key, value in self.map.items():
+            if key == "tag":
                 continue
-            dumper.add(f'{k} "{v}"')
+            dumper.add(f'{key} "{value}"')
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
 
 class Workspace:
@@ -307,62 +304,67 @@ class Workspace:
         )
 
     def dump(self, dumper: Dumper = Dumper()) -> None:
-        dumper.add(f'workspace {{')
+        dumper.add('workspace {')
         dumper.indent()
 
-        dumper.add(f'model {{')
+        dumper.add('model {')
         dumper.indent()
         for model in self.models:
             model.dump(dumper)
         for model in self.models:
             model.dump_relationships(dumper)
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
-        dumper.add(f'views {{')
+        dumper.add('views {')
         dumper.indent()
         for view in self.views:
             view.dump(dumper)
-        dumper.add(f'styles {{')
+        dumper.add('styles {')
         dumper.indent()
         for style in self.styles:
             style.dump(dumper)
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
 
         dumper.outdent()
-        dumper.add(f'}}')
+        dumper.add('}')
         return dumper.result()
 
+    # pylint: disable=invalid-name
     def Model(self, model: Optional[Model]=None, name: Optional[str]=None):
         if model is None:
             model = Model(name)
         self.models.append(model)
         return model
 
+    # pylint: disable=invalid-name
     def SystemLandscapeView(self, name: str, description: str):
         view = View(View.Kind.SYSTEM_LANDSCAPE, None, name, description)
         self.views.append(view)
         return view
-    
+
+    # pylint: disable=invalid-name
     def SystemContextView(self, element: Element, name: str, description: str):
         view = View(View.Kind.SYSTEM_CONTEXT, element, name, description)
         self.views.append(view)
         return view
-    
+
+    # pylint: disable=invalid-name
     def ContainerView(self, element: Element, name: str, description: str):
         view = View(View.Kind.CONTAINER, element, name, description)
         self.views.append(view)
         return view
-    
+
+    # pylint: disable=invalid-name
     def ComponentView(self, element: Element, name: str, description: str):
         view = View(View.Kind.COMPONENT, element, name, description)
         self.views.append(view)
         return view
 
+    # pylint: disable=invalid-name
     def Styles(self, *styles: dict[str, str]) -> None:
         for style in styles:
             self.styles.append(Style(style))
-    

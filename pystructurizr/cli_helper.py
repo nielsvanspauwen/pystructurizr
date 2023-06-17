@@ -1,13 +1,12 @@
-import click
 import importlib
+import json
+import os
 import subprocess
 import sys
+
 import aiofiles
 import click
 import httpx
-import sys
-import os
-import json
 
 
 def generate_diagram_code(view: str) -> str:
@@ -18,8 +17,10 @@ def generate_diagram_code(view: str) -> str:
         code = module.workspace.dump()
         return code, imported_modules
     except ModuleNotFoundError:
+        # pylint: disable=raise-missing-from
         raise click.BadParameter("Invalid view name. Make sure you don't include the .py file extension.")
     except AttributeError:
+        # pylint: disable=raise-missing-from
         raise click.BadParameter("Non-compliant view file: make sure it exports the PyStructurizr workspace.")
 
 
@@ -35,7 +36,7 @@ def generate_diagram_code_in_child_process(view: str) -> str:
 
 
 async def generate_svg(diagram_code: str, tmp_folder: str) -> str:
-    url = f"https://kroki.io/structurizr/svg"
+    url = "https://kroki.io/structurizr/svg"
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, data=diagram_code)
 
@@ -44,10 +45,10 @@ async def generate_svg(diagram_code: str, tmp_folder: str) -> str:
         if resp.content:
             print(resp.content.decode())
         raise click.ClickException("Failed to create diagram")
-    
+
     svg_file_path = f"{tmp_folder}/diagram.svg"
-    async with aiofiles.open(svg_file_path, "w") as f:
-        await f.write(resp.text)
+    async with aiofiles.open(svg_file_path, "w") as svg_file:
+        await svg_file.write(resp.text)
 
     return svg_file_path
 

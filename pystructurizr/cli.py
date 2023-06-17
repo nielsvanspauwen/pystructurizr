@@ -1,19 +1,21 @@
-import click
 import asyncio
+import json
 import os
 import shutil
 import subprocess
-import json
-from .cli_helper import generate_diagram_code, generate_diagram_code_in_child_process, generate_svg, ensure_tmp_folder_exists
-from .cli_watcher import observe_modules
-from .cloudstorage import create_cloud_storage, CloudStorage
 
+import click
+
+from .cli_helper import (ensure_tmp_folder_exists, generate_diagram_code,
+                         generate_diagram_code_in_child_process, generate_svg)
+from .cli_watcher import observe_modules
+from .cloudstorage import CloudStorage, create_cloud_storage
 
 
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. example.componentview)',
               help='The view file to generate.')
-@click.option('--as-json', is_flag=True, default=False, 
+@click.option('--as-json', is_flag=True, default=False,
               help='Dumps the generated code and the imported modules as a json object')
 def dump(view, as_json):
     diagram_code, imported_modules = generate_diagram_code(view)
@@ -47,6 +49,7 @@ def dev(view):
     async def observe_loop():
         modules_to_watch = await async_behavior()
         click.echo("Launching webserver...")
+        # pylint: disable=consider-using-with
         subprocess.Popen(f"httpwatcher --root {tmp_folder} --watch {tmp_folder}", shell=True)
         await observe_modules(modules_to_watch, async_behavior)
 
@@ -76,7 +79,7 @@ def build(view, gcs_credentials, bucket_name, object_name):
         cloud_storage = create_cloud_storage(CloudStorage.Provider.GCS, gcs_credentials)
         svg_file_url = cloud_storage.upload_file(svg_file_path, bucket_name, object_name)
         print(svg_file_url)
-    
+
     asyncio.run(async_behavior())
 
 
