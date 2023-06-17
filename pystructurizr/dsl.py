@@ -275,6 +275,36 @@ class Workspace:
         self.models = []
         self.views = []
         self.styles = []
+        # Default styling
+        self.Styles(
+            {
+                "tag": "Element",
+                "shape": "RoundedBox"
+            }, {
+                "tag": "Software System",
+                "background": "#1168bd",
+                "color": "#ffffff"
+            }, {
+                "tag": "Container",
+                "background": "#438dd5",
+                "color": "#ffffff"
+            }, {
+                "tag": "Component",
+                "background": "#85bbf0",
+                "color": "#000000"
+            }, {
+                "tag": "Person",
+                "background": "#08427b",
+                "color": "#ffffff",
+                "shape": "Person"
+            }, {
+                "tag": "Infrastructure Node",
+                "background": "#ffffff"
+            }, {
+                "tag": "database",
+                "shape": "Cylinder"
+            }
+        )
 
     def dump(self, dumper: Dumper = Dumper()) -> None:
         dumper.add(f'workspace {{')
