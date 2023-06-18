@@ -1,5 +1,5 @@
 [pycodestyle]
-max-line-length = 140
+max-line-length = 160
 
 [pylint.messages control]
 disable = missing-module-docstring, missing-function-docstring, missing-class-docstring
