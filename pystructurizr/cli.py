@@ -69,7 +69,7 @@ def dev(view):
 def build(view, gcs_credentials, bucket_name, object_name):
     async def async_behavior():
         # Generate diagram
-        diagram_code = generate_diagram_code(view)
+        diagram_code, _ = generate_diagram_code(view)
         tmp_folder = ensure_tmp_folder_exists()
 
         # Generate SVG
