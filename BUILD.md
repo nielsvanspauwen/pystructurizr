@@ -13,7 +13,7 @@ To test the package before uploading to PyPi:
 $ python -m venv myenv
 $ source myenv/bin/activate
 $ pip install .
-$ pystructurizr dev --view example.containerview
+$ pystructurizr dev --view example.chatsystem_containerview
 $ deactivate
 $ rm -fr myenv
 ```
