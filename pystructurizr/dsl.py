@@ -1,7 +1,7 @@
 import keyword
 import re
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 # pylint: disable=too-few-public-methods
@@ -253,7 +253,7 @@ class View:
 
 
 class Style:
-    def __init__(self, style_map: dict[str, str]):
+    def __init__(self, style_map: Dict[str, str]):
         self.map = style_map
 
     def dump(self, dumper: Dumper) -> None:
@@ -365,6 +365,6 @@ class Workspace:
         return view
 
     # pylint: disable=invalid-name
-    def Styles(self, *styles: dict[str, str]) -> None:
+    def Styles(self, *styles: Dict[str, str]) -> None:
         for style in styles:
             self.styles.append(Style(style))
