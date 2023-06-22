@@ -1,4 +1,3 @@
-import importlib
 import json
 import os
 import subprocess
@@ -9,33 +8,19 @@ import click
 import httpx
 
 
-def generate_diagram_code(view: str) -> str:
-    try:
-        initial_modules = set(sys.modules.keys())
-        module = importlib.import_module(view)
-        imported_modules = set(sys.modules.keys()) - initial_modules
-        code = module.workspace.dump()
-        return code, imported_modules
-    except ModuleNotFoundError:
-        # pylint: disable=raise-missing-from
-        raise click.BadParameter("Invalid view name. Make sure you don't include the .py file extension.")
-    except AttributeError:
-        # pylint: disable=raise-missing-from
-        raise click.BadParameter("Non-compliant view file: make sure it exports the PyStructurizr workspace.")
-
-
-def generate_diagram_code_in_child_process(view: str) -> str:
+def generate_diagram_code_in_child_process(view: str) -> tuple[dict, list[str]]:
     def run_child_process():
         # Run a separate Python script as a child process
-        output = subprocess.check_output([sys.executable, "-m", "pystructurizr.cli", "dump", "--as-json", "--view", view])
+        output = subprocess.check_output([sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view])
         return output.decode().strip()
 
     # Run the child process and capture its output
     child_output = run_child_process()
-    return json.loads(child_output)
+    result = json.loads(child_output)
+    return result['code'], result['imported_modules']
 
 
-async def generate_svg(diagram_code: str, tmp_folder: str) -> str:
+async def generate_svg(diagram_code: dict, tmp_folder: str) -> str:
     url = "https://kroki.io/structurizr/svg"
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, data=diagram_code)
