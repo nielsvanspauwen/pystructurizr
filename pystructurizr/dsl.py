@@ -74,7 +74,7 @@ class Element:
 
 
 class Person(Element):
-    def dump(self, dumper: Dumper) -> None:
+    def dump(self, dumper: Dumper, with_docs: bool = True) -> None:
         dumper.add(f'{self.instname} = Person "{self.name}" "{self.description}" {{')
         dumper.indent()
         if self.technology:
@@ -106,9 +106,10 @@ class Component(Element):
 
 
 class Container(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
+    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None, docs: str = None):
         super().__init__(name, description, technology, tags)
         self.elements = []
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -134,9 +135,11 @@ class Container(Element):
         self.elements.append(g)
         return g
 
-    def dump(self, dumper: Dumper) -> None:
+    def dump(self, dumper: Dumper, with_docs: bool = True) -> None:
         dumper.add(f'{self.instname} = Container "{self.name}" "{self.description}" {{')
         dumper.indent()
+        if with_docs and self.docs:
+            dumper.add(f"!docs {self.docs}")
         if self.technology:
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
@@ -154,9 +157,10 @@ class Container(Element):
 
 
 class SoftwareSystem(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
+    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None, docs: str = None):
         super().__init__(name, description, technology, tags)
         self.elements = []
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -182,15 +186,17 @@ class SoftwareSystem(Element):
         self.elements.append(g)
         return g
 
-    def dump(self, dumper: Dumper) -> None:
+    def dump(self, dumper: Dumper, with_docs: bool = True) -> None:
         dumper.add(f'{self.instname} = SoftwareSystem "{self.name}" "{self.description}" {{')
         dumper.indent()
+        if with_docs and self.docs:
+            dumper.add(f"!docs {self.docs}")
         if self.technology:
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
             dumper.add(f'tags "{", ".join(self.tags)}"')
         for el in self.elements:
-            el.dump(dumper)
+            el.dump(dumper, with_docs)
         dumper.outdent()
         dumper.add('}')
 
@@ -308,9 +314,9 @@ class Model(Element):
         self.elements.append(g)
         return g
 
-    def dump(self, dumper: Dumper) -> None:
+    def dump(self, dumper: Dumper, with_docs: bool = False) -> None:
         for element in self.elements:
-            element.dump(dumper)
+            element.dump(dumper, with_docs)
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for element in self.elements:
@@ -382,7 +388,7 @@ class Style:
 
 
 class Workspace:
-    def __init__(self):
+    def __init__(self, docs: str = None):
         self.models = []
         self.views = []
         self.styles = []
@@ -416,6 +422,7 @@ class Workspace:
                 "shape": "Cylinder"
             }
         )
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -423,9 +430,11 @@ class Workspace:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def dump(self, dumper: Dumper = Dumper()) -> None:
+    def dump(self, dumper: Dumper = Dumper(), with_docs=True) -> None:
         dumper.add('workspace {')
         dumper.indent()
+        if with_docs and self.docs:
+            dumper.add(f"!docs {self.docs}")
 
         dumper.add('model {')
         dumper.indent()
@@ -435,7 +444,7 @@ class Workspace:
         dumper.outdent()
         dumper.add('}')
         for model in self.models:
-            model.dump(dumper)
+            model.dump(dumper, with_docs)
         for model in self.models:
             model.dump_relationships(dumper)
         dumper.outdent()

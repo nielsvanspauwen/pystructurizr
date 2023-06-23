@@ -8,12 +8,15 @@ import click
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. example.componentview)',
               help='The view file to generate.')
-def dump(view: str):
+@click.option(
+    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
+    is_flag=True, default=False)
+def dump(view: str, docs: bool):
     try:
         initial_modules = set(sys.modules.keys())
         module = importlib.import_module(view)
         imported_modules = set(sys.modules.keys()) - initial_modules
-        code = module.workspace.dump()
+        code = module.workspace.dump(with_docs=docs)
         print(json.dumps({
             "code": code,
             "imported_modules": list(imported_modules)

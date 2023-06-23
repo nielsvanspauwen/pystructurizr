@@ -16,8 +16,11 @@ from .cloudstorage import CloudStorage, create_cloud_storage
               help='The view file to generate.')
 @click.option('--as-json', is_flag=True, default=False,
               help='Dumps the generated code and the imported modules as a json object')
-def dump(view, as_json):
-    diagram_code, imported_modules = generate_diagram_code_in_child_process(view)
+@click.option(
+    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
+    is_flag=True, default=True)
+def dump(view, as_json, docs: bool):
+    diagram_code, imported_modules = generate_diagram_code_in_child_process(view, docs)
     if as_json:
         print(json.dumps({
             "code": diagram_code,
@@ -30,7 +33,10 @@ def dump(view, as_json):
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. examples.single_file_example)',
               help='The view file to develop.')
-def dev(view):
+@click.option(
+    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
+    is_flag=True, default=False)
+def dev(view, docs: bool):
     click.echo(f"Setting up live preview of view {view}...")
     # Prep the /tmp/pystructurizr folder
     tmp_folder = ensure_tmp_folder_exists()
@@ -40,7 +46,7 @@ def dev(view):
 
     async def async_behavior():
         print("Generating diagram...")
-        diagram_code, imported_modules = generate_diagram_code_in_child_process(view)
+        diagram_code, imported_modules = generate_diagram_code_in_child_process(view, docs)
         await generate_svg(diagram_code, tmp_folder)
         return imported_modules
 
@@ -63,10 +69,13 @@ def dev(view):
               help='The name of the bucket to use on Google Cloud Storage.')
 @click.option('--object-name', prompt='Name of the object on Google Cloud Storage',
               help='The name of the object to use on Google Cloud Storage.')
-def build(view, gcs_credentials, bucket_name, object_name):
+@click.option(
+    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
+    is_flag=True, default=False)
+def build(view, gcs_credentials, bucket_name, object_name, docs: bool):
     async def async_behavior():
         # Generate diagram
-        diagram_code, _ = generate_diagram_code_in_child_process(view)
+        diagram_code, _ = generate_diagram_code_in_child_process(view, docs)
         tmp_folder = ensure_tmp_folder_exists()
 
         # Generate SVG
