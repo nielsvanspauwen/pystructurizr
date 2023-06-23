@@ -8,7 +8,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setup(
     name='pystructurizr',
-    version='0.1.1',
+    version='0.1.2',
     description='A Python DSL inspired by Structurizr, intended for generating C4 diagrams',
     long_description=long_description,
     long_description_content_type="text/markdown",
