@@ -33,10 +33,7 @@ def dump(view, as_json, docs: bool):
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. examples.single_file_example)',
               help='The view file to develop.')
-@click.option(
-    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
-    is_flag=True, default=False)
-def dev(view, docs: bool):
+def dev(view):
     click.echo(f"Setting up live preview of view {view}...")
     # Prep the /tmp/pystructurizr folder
     tmp_folder = ensure_tmp_folder_exists()
@@ -46,7 +43,7 @@ def dev(view, docs: bool):
 
     async def async_behavior():
         print("Generating diagram...")
-        diagram_code, imported_modules = generate_diagram_code_in_child_process(view, docs)
+        diagram_code, imported_modules = generate_diagram_code_in_child_process(view, False)
         await generate_svg(diagram_code, tmp_folder)
         return imported_modules
 
@@ -69,13 +66,10 @@ def dev(view, docs: bool):
               help='The name of the bucket to use on Google Cloud Storage.')
 @click.option('--object-name', prompt='Name of the object on Google Cloud Storage',
               help='The name of the object to use on Google Cloud Storage.')
-@click.option(
-    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
-    is_flag=True, default=False)
-def build(view, gcs_credentials, bucket_name, object_name, docs: bool):
+def build(view, gcs_credentials, bucket_name, object_name):
     async def async_behavior():
         # Generate diagram
-        diagram_code, _ = generate_diagram_code_in_child_process(view, docs)
+        diagram_code, _ = generate_diagram_code_in_child_process(view, False)
         tmp_folder = ensure_tmp_folder_exists()
 
         # Generate SVG
