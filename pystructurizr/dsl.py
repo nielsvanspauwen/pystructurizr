@@ -108,7 +108,13 @@ class Component(Element):
 class Container(Element):
     def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
         super().__init__(name, description, technology, tags)
-        self.components = []
+        self.elements = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     # pylint: disable=invalid-name
     def Component(self, *args, **kwargs) -> Component:
@@ -116,8 +122,17 @@ class Container(Element):
             component = args[0]
         else:
             component = Component(*args, **kwargs)
-        self.components.append(component)
+        self.elements.append(component)
         return component
+    
+    # pylint: disable=invalid-name
+    def Group(self, *args, **kwargs) -> "Group":
+        if args and isinstance(args[0], Group):
+            g = args[0]
+        else:
+            g = Group(*args, **kwargs)
+        self.elements.append(g)
+        return g
 
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = Container "{self.name}" "{self.description}" {{')
@@ -126,22 +141,28 @@ class Container(Element):
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
             dumper.add(f'tags "{", ".join(self.tags)}"')
-        for component in self.components:
-            component.dump(dumper)
+        for el in self.elements:
+            el.dump(dumper)
         dumper.outdent()
         dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
             rel.dump(dumper)
-        for component in self.components:
-            component.dump_relationships(dumper)
+        for el in self.elements:
+            el.dump_relationships(dumper)
 
 
 class SoftwareSystem(Element):
     def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
         super().__init__(name, description, technology, tags)
-        self.containers = []
+        self.elements = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     # pylint: disable=invalid-name
     def Container(self, *args, **kwargs) -> Container:
@@ -149,8 +170,17 @@ class SoftwareSystem(Element):
             container = args[0]
         else:
             container = Container(*args, **kwargs)
-        self.containers.append(container)
+        self.elements.append(container)
         return container
+    
+    # pylint: disable=invalid-name
+    def Group(self, *args, **kwargs) -> "Group":
+        if args and isinstance(args[0], Group):
+            g = args[0]
+        else:
+            g = Group(*args, **kwargs)
+        self.elements.append(g)
+        return g
 
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = SoftwareSystem "{self.name}" "{self.description}" {{')
@@ -159,22 +189,28 @@ class SoftwareSystem(Element):
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
             dumper.add(f'tags "{", ".join(self.tags)}"')
-        for container in self.containers:
-            container.dump(dumper)
+        for el in self.elements:
+            el.dump(dumper)
         dumper.outdent()
         dumper.add('}')
 
     def dump_relationships(self, dumper: Dumper) -> None:
         for rel in self.relationships:
             rel.dump(dumper)
-        for container in self.containers:
-            container.dump_relationships(dumper)
+        for el in self.elements:
+            el.dump_relationships(dumper)
 
 
-class Model(Element):
+class Group(Element):
     def __init__(self, name: str):
         super().__init__(name)
         self.elements = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     # pylint: disable=invalid-name
     def Person(self, *args, **kwargs) -> Person:
@@ -193,6 +229,88 @@ class Model(Element):
             system = SoftwareSystem(*args, **kwargs)
         self.elements.append(system)
         return system
+
+    # pylint: disable=invalid-name
+    def Container(self, *args, **kwargs) -> Container:
+        if args and isinstance(args[0], Container):
+            container = args[0]
+        else:
+            container = Container(*args, **kwargs)
+        self.elements.append(container)
+        return container
+    
+    # pylint: disable=invalid-name
+    def Component(self, *args, **kwargs) -> Component:
+        if args and isinstance(args[0], Component):
+            component = args[0]
+        else:
+            component = Component(*args, **kwargs)
+        self.elements.append(component)
+        return component
+    
+    # pylint: disable=invalid-name
+    def Group(self, *args, **kwargs) -> "Group":
+        if args and isinstance(args[0], Group):
+            g = args[0]
+        else:
+            g = Group(*args, **kwargs)
+        self.elements.append(g)
+        return g
+    
+    def dump(self, dumper: Dumper) -> None:
+        for element in self.elements:
+            element.dump(dumper)
+
+    def dump(self, dumper: Dumper) -> None:
+        dumper.add(f'group "{self.name}" {{')
+        dumper.indent()
+        for element in self.elements:
+            element.dump(dumper)
+        dumper.outdent()
+        dumper.add('}')
+
+    def dump_relationships(self, dumper: Dumper) -> None:
+        for element in self.elements:
+            element.dump_relationships(dumper)
+
+
+class Model(Element):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.elements = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    # pylint: disable=invalid-name
+    def Person(self, *args, **kwargs) -> Person:
+        if args and isinstance(args[0], Person):
+            person = args[0]
+        else:
+            person = Person(*args, **kwargs)
+        self.elements.append(person)
+        return person
+
+    # pylint: disable=invalid-name
+    def SoftwareSystem(self, *args, **kwargs) -> SoftwareSystem:
+        if args and isinstance(args[0], SoftwareSystem):
+            system = args[0]
+        else:
+            system = SoftwareSystem(*args, **kwargs)
+        self.elements.append(system)
+        return system
+    
+    # pylint: disable=invalid-name
+    def Group(self, *args, **kwargs) -> Group:
+        if args and isinstance(args[0], Group):
+            g = args[0]
+        else:
+            g = Group(*args, **kwargs)
+        self.elements.append(g)
+        return g
 
     def dump(self, dumper: Dumper) -> None:
         for element in self.elements:
@@ -303,12 +421,23 @@ class Workspace:
             }
         )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
     def dump(self, dumper: Dumper = Dumper()) -> None:
         dumper.add('workspace {')
         dumper.indent()
 
         dumper.add('model {')
         dumper.indent()
+        dumper.add('properties {')
+        dumper.indent()
+        dumper.add('"structurizr.groupSeparator" "/"')
+        dumper.outdent()
+        dumper.add('}')
         for model in self.models:
             model.dump(dumper)
         for model in self.models:
