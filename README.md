@@ -40,15 +40,16 @@ In PyStructurizr, this becomes:
 from pystructurizr.dsl import Workspace
 
 # Create the model(s)
-workspace = Workspace()
-user = workspace.Model("Users").Person("User")
-software_system = workspace.Model("System").SoftwareSystem("Software System")
-webapp = software_system.Container("Web Application")
-db = software_system.Container("Database")
+with Workspace() as workspace:
+    with workspace.Model(name="model") as model:
+        user = model.Person("User")
+        with model.SoftwareSystem("Software System") as software_system:
+            webapp = software_system.Container("Web Application")
+            db = software_system.Container("Database")
 
-# Define the relationships
-user.uses(webapp, "Uses")
-webapp.uses(db, "Reads from and writes to")
+    # Define the relationships
+    user.uses(webapp, "Uses")
+    webapp.uses(db, "Reads from and writes to")
 
 # Create a view onto the model
 workspace.ContainerView(
