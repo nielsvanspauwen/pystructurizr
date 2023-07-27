@@ -258,10 +258,6 @@ class Group(Element):
         return g
 
     def dump(self, dumper: Dumper) -> None:
-        for element in self.elements:
-            element.dump(dumper)
-
-    def dump(self, dumper: Dumper) -> None:
         dumper.add(f'group "{self.name}" {{')
         dumper.indent()
         for element in self.elements:
