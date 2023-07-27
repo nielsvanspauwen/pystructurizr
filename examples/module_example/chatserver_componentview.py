@@ -1,5 +1,5 @@
-from example.workspace import workspace
-from example.chatsystem import chat_server
+from .workspace import workspace
+from .chatsystem import chat_server
 
 workspace.ComponentView(
     chat_server,

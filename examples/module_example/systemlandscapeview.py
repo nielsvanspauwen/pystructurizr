@@ -1,4 +1,4 @@
-from example.workspace import workspace
+from .workspace import workspace
 
 system_view = workspace.SystemLandscapeView(
     "System View",

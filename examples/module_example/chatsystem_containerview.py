@@ -1,5 +1,5 @@
-from example.workspace import workspace
-from example.chatsystem import chat_system
+from .workspace import workspace
+from .chatsystem import chat_system
 
 workspace.ContainerView(
     chat_system,
