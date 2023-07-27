@@ -124,7 +124,7 @@ class Container(Element):
             component = Component(*args, **kwargs)
         self.elements.append(component)
         return component
-    
+
     # pylint: disable=invalid-name
     def Group(self, *args, **kwargs) -> "Group":
         if args and isinstance(args[0], Group):
@@ -172,7 +172,7 @@ class SoftwareSystem(Element):
             container = Container(*args, **kwargs)
         self.elements.append(container)
         return container
-    
+
     # pylint: disable=invalid-name
     def Group(self, *args, **kwargs) -> "Group":
         if args and isinstance(args[0], Group):
@@ -238,7 +238,7 @@ class Group(Element):
             container = Container(*args, **kwargs)
         self.elements.append(container)
         return container
-    
+
     # pylint: disable=invalid-name
     def Component(self, *args, **kwargs) -> Component:
         if args and isinstance(args[0], Component):
@@ -247,7 +247,7 @@ class Group(Element):
             component = Component(*args, **kwargs)
         self.elements.append(component)
         return component
-    
+
     # pylint: disable=invalid-name
     def Group(self, *args, **kwargs) -> "Group":
         if args and isinstance(args[0], Group):
@@ -256,7 +256,7 @@ class Group(Element):
             g = Group(*args, **kwargs)
         self.elements.append(g)
         return g
-    
+
     def dump(self, dumper: Dumper) -> None:
         for element in self.elements:
             element.dump(dumper)
@@ -302,7 +302,7 @@ class Model(Element):
             system = SoftwareSystem(*args, **kwargs)
         self.elements.append(system)
         return system
-    
+
     # pylint: disable=invalid-name
     def Group(self, *args, **kwargs) -> Group:
         if args and isinstance(args[0], Group):
