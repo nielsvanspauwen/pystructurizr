@@ -1,7 +1,7 @@
 # PyStructurizr
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 [![PyPI version](https://badge.fury.io/py/pystructurizr.svg)](https://badge.fury.io/py/pystructurizr)
-[![Pylint](https://github.com/nielsvanspauwen/pystructurizr/actions/workflows/pylint.yml/badge.svg)](https://github.com/nielsvanspauwen/pystructurizr/actions/workflows/pylint.yml)
+[![Pylint](https://github.com/nielsvanspauwen/pystructurizr/actions/workflows/pylint.yml/badge.svg?branch=master)](https://github.com/nielsvanspauwen/pystructurizr/actions/workflows/pylint.yml)
 
 PyStructurizr provides a Python DSL inspired by [Structurizr](https://structurizr.com/), and is intended for generating C4 diagrams.
 
