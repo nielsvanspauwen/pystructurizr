@@ -1,6 +1,6 @@
-from example.workspace import workspace
-from example.analysissystem import analysis_system
-from example.chatsystem import chat_server
+from .workspace import workspace
+from .analysissystem import analysis_system
+from .chatsystem import chat_server
 
 workspace.ContainerView(
     analysis_system,

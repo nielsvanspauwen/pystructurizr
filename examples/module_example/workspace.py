@@ -1,8 +1,8 @@
 from pystructurizr.dsl import Workspace
 
-from example.users import users
-from example.chatsystem import chat
-from example.analysissystem import analytics
+from .users import users
+from .chatsystem import chat
+from .analysissystem import analytics
 
 workspace = Workspace()
 workspace.Model(users)

@@ -9,13 +9,13 @@ For the purpose of this example, assume Team A works on the core chat product, a
 
 The `workspace.py` file brings the different models and software systems together, and adds toplevel relationships between them.
 
-Finally, multipe view files (`componentview.py`, `containerview.py`, `systemlandscapeview.py`) describe which views to generate an SVG for.
+Finally, multipe view files (`chatserver_componentview.py`, `chatsystem_containerview.py`, `analysissystem_containerview.py` `systemlandscapeview.py`) describe which views to generate an SVG for.
 
 To run the example, you would for instance do:
 ```
-$ pystructurizr dev --view example.componentview
+$ pystructurizr dev --view examples.module_example.systemlandscapeview
 ```
 or 
 ```
-$ pystructurizr build --view example.containerview --gcs-credentials <...> --bucket-name <...> --object-name <...>
+$ pystructurizr build --view examples.module_example.systemlandscapeview --gcs-credentials <...> --bucket-name <...> --object-name <...>
 ```
