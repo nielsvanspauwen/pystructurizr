@@ -14,7 +14,7 @@ class CliTest(unittest.TestCase):
         pass
 
     def test_dump(self):
-        result = self.runner.invoke(cli.dump, ['--view', 'example.systemlandscapeview'])
+        result = self.runner.invoke(cli.dump, ['--view', 'examples.single_file_example'])
 
         gold_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.gold')
         with open(gold_file, "r", encoding='utf-8') as gfile:

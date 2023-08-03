@@ -12,7 +12,7 @@ from .cloudstorage import CloudStorage, create_cloud_storage
 
 
 @click.command()
-@click.option('--view', prompt='Your view file (e.g. example.componentview)',
+@click.option('--view', prompt='Your view file (e.g. examples.single_file_example)',
               help='The view file to generate.')
 @click.option('--as-json', is_flag=True, default=False,
               help='Dumps the generated code and the imported modules as a json object')
@@ -28,7 +28,7 @@ def dump(view, as_json):
 
 
 @click.command()
-@click.option('--view', prompt='Your view file (e.g. example.componentview)',
+@click.option('--view', prompt='Your view file (e.g. examples.single_file_example)',
               help='The view file to develop.')
 def dev(view):
     click.echo(f"Setting up live preview of view {view}...")
@@ -55,7 +55,7 @@ def dev(view):
 
 
 @click.command()
-@click.option('--view', prompt='Your view file (e.g. example.componentview)',
+@click.option('--view', prompt='Your view file (e.g. examples.single_file_example)',
               help='The view file to generate and upload to cloud storage.')
 @click.option('--gcs-credentials', prompt='Path to json file containing Google Cloud Storage credentials', type=click.Path(exists=True),
               help='Path to the credentials.json file for Google Cloud Storage.')
