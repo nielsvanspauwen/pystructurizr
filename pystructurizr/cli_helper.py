@@ -8,13 +8,13 @@ import click
 import httpx
 
 
-def generate_diagram_code_in_child_process(view: str, docs: bool) -> tuple[dict, list[str]]:
+def generate_diagram_code_in_child_process(view: str, directives: bool) -> tuple[dict, list[str]]:
     def run_child_process():
         # Run a separate Python script as a child process
-        if docs:
-            output = subprocess.check_output([sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view, "--docs"])
-        else:
-            output = subprocess.check_output([sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view])
+        executable = [sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view]
+        if directives:
+            executable.append("--directives")
+        output = subprocess.check_output(executable)
         return output.decode().strip()
 
     # Run the child process and capture its output

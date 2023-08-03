@@ -17,10 +17,10 @@ from .cloudstorage import CloudStorage, create_cloud_storage
 @click.option('--as-json', is_flag=True, default=False,
               help='Dumps the generated code and the imported modules as a json object')
 @click.option(
-    "--docs", prompt="Flag to add the !docs directive or omit", help="Flag to add the !docs directive or omit",
-    is_flag=True, default=True)
-def dump(view, as_json, docs: bool):
-    diagram_code, imported_modules = generate_diagram_code_in_child_process(view, docs)
+    "--directives", help="Flag to add extra directives (i.e. !docs) or omit",
+    is_flag=True, default=False)
+def dump(view, as_json, directives: bool):
+    diagram_code, imported_modules = generate_diagram_code_in_child_process(view, directives)
     if as_json:
         print(json.dumps({
             "code": diagram_code,
