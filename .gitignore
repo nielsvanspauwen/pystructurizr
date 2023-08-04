@@ -16,3 +16,5 @@ build/
 
 # Credentials
 gcs_credentials.json
+
+.idea/
