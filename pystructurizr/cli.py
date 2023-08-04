@@ -16,8 +16,11 @@ from .cloudstorage import CloudStorage, create_cloud_storage
               help='The view file to generate.')
 @click.option('--as-json', is_flag=True, default=False,
               help='Dumps the generated code and the imported modules as a json object')
-def dump(view, as_json):
-    diagram_code, imported_modules = generate_diagram_code_in_child_process(view)
+@click.option(
+    "--directives", help="Flag to add extra directives (i.e. !docs) or omit",
+    is_flag=True, default=False)
+def dump(view, as_json, directives: bool):
+    diagram_code, imported_modules = generate_diagram_code_in_child_process(view, directives)
     if as_json:
         print(json.dumps({
             "code": diagram_code,
@@ -40,7 +43,7 @@ def dev(view):
 
     async def async_behavior():
         print("Generating diagram...")
-        diagram_code, imported_modules = generate_diagram_code_in_child_process(view)
+        diagram_code, imported_modules = generate_diagram_code_in_child_process(view, False)
         await generate_svg(diagram_code, tmp_folder)
         return imported_modules
 
@@ -66,7 +69,7 @@ def dev(view):
 def build(view, gcs_credentials, bucket_name, object_name):
     async def async_behavior():
         # Generate diagram
-        diagram_code, _ = generate_diagram_code_in_child_process(view)
+        diagram_code, _ = generate_diagram_code_in_child_process(view, False)
         tmp_folder = ensure_tmp_folder_exists()
 
         # Generate SVG

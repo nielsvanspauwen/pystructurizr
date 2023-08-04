@@ -4,16 +4,22 @@ import sys
 
 import click
 
+from pystructurizr.dsl import Dumper
+
 
 @click.command()
 @click.option('--view', prompt='Your view file (e.g. example.componentview)',
               help='The view file to generate.')
-def dump(view: str):
+@click.option(
+    "--directives", help="Flag to add extra directives (i.e. !docs) or omit",
+    is_flag=True, default=False)
+def dump(view: str, directives: bool):
     try:
         initial_modules = set(sys.modules.keys())
         module = importlib.import_module(view)
         imported_modules = set(sys.modules.keys()) - initial_modules
-        code = module.workspace.dump()
+        dumper = Dumper(with_directives=directives)
+        code = module.workspace.dump(dumper=dumper)
         print(json.dumps({
             "code": code,
             "imported_modules": list(imported_modules)

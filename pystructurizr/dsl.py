@@ -1,7 +1,7 @@
 import keyword
 import re
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 
 
 # pylint: disable=too-few-public-methods
@@ -35,9 +35,14 @@ class Identifier:
 
 
 class Dumper:
-    def __init__(self):
+    def __init__(self, with_directives: bool = True):
+        self.with_directives = with_directives
         self.level = 0
         self.lines = []
+
+    def add_directive(self, type: Literal['!docs', '!adrs'], value: str) -> None:
+        if self.with_directives:
+            self.add(f"{type} {value}")
 
     def add(self, txt: str) -> None:
         self.lines.append(f'{"  " * self.level}{txt}')
@@ -106,9 +111,10 @@ class Component(Element):
 
 
 class Container(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
+    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None, docs: str = None):
         super().__init__(name, description, technology, tags)
         self.elements = []
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -137,6 +143,8 @@ class Container(Element):
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = Container "{self.name}" "{self.description}" {{')
         dumper.indent()
+        if self.docs:
+            dumper.add_directive("!docs", f"{self.docs}")
         if self.technology:
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
@@ -154,9 +162,10 @@ class Container(Element):
 
 
 class SoftwareSystem(Element):
-    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None):
+    def __init__(self, name: str, description: Optional[str]=None, technology: Optional[str]=None, tags: Optional[List[str]]=None, docs: str = None):
         super().__init__(name, description, technology, tags)
         self.elements = []
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -185,6 +194,8 @@ class SoftwareSystem(Element):
     def dump(self, dumper: Dumper) -> None:
         dumper.add(f'{self.instname} = SoftwareSystem "{self.name}" "{self.description}" {{')
         dumper.indent()
+        if self.docs:
+            dumper.add_directive("!docs", f"{self.docs}")
         if self.technology:
             dumper.add(f'technology "{self.technology}"')
         if self.tags:
@@ -382,7 +393,7 @@ class Style:
 
 
 class Workspace:
-    def __init__(self):
+    def __init__(self, docs: str = None):
         self.models = []
         self.views = []
         self.styles = []
@@ -416,6 +427,7 @@ class Workspace:
                 "shape": "Cylinder"
             }
         )
+        self.docs = docs
 
     def __enter__(self):
         return self
@@ -423,9 +435,11 @@ class Workspace:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def dump(self, dumper: Dumper = Dumper()) -> None:
+    def dump(self, dumper: Dumper = Dumper()) -> str:
         dumper.add('workspace {')
         dumper.indent()
+        if self.docs:
+            dumper.add_directive("!docs",  f"{self.docs}")
 
         dumper.add('model {')
         dumper.indent()
