@@ -61,7 +61,7 @@ class Element:
         self.relationships = []
         self.instname = Identifier.make_identifier(name)
 
-    def uses(self, destination: str, description: Optional[str]=None, technology: Optional[str]=None) -> 'Relationship':
+    def uses(self, destination: 'Element', description: Optional[str]=None, technology: Optional[str]=None) -> 'Relationship':
         relationship = Relationship(self, destination, description, technology)
         self.relationships.append(relationship)
         return relationship
@@ -423,7 +423,7 @@ class Workspace:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def dump(self, dumper: Dumper = Dumper()) -> None:
+    def dump(self, dumper: Dumper = Dumper()) -> str:
         dumper.add('workspace {')
         dumper.indent()
 
