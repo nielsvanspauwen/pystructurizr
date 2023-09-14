@@ -1,3 +1,4 @@
+from typing import List, Dict, Tuple
 import json
 import os
 import subprocess
@@ -8,7 +9,7 @@ import click
 import httpx
 
 
-def generate_diagram_code_in_child_process(view: str) -> tuple[dict, list[str]]:
+def generate_diagram_code_in_child_process(view: str) -> Tuple[Dict, List[str]]:
     def run_child_process():
         # Run a separate Python script as a child process
         output = subprocess.check_output([sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view])
@@ -20,7 +21,7 @@ def generate_diagram_code_in_child_process(view: str) -> tuple[dict, list[str]]:
     return result['code'], result['imported_modules']
 
 
-async def generate_svg(diagram_code: dict, tmp_folder: str) -> str:
+async def generate_svg(diagram_code: Dict, tmp_folder: str) -> str:
     url = "https://kroki.io/structurizr/svg"
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, data=diagram_code)
