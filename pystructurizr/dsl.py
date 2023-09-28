@@ -356,7 +356,8 @@ class View:
         dumper.indent()
         if self.description:
             dumper.add(f'description "{self.description}"')
-        dumper.add('include *')
+        if not self.includes and not self.excludes:
+          dumper.add('include *')
         for include in self.includes:
             dumper.add(f'include {include.instname}')
         for exclude in self.excludes:
