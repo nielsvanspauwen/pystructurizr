@@ -8,11 +8,25 @@ import aiofiles
 import click
 import httpx
 
+import google.auth.transport.requests
+import google.auth
+
+from .config import URL
+
+
+def _get_token():
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    request = google.auth.transport.requests.Request()
+    creds, _ = google.auth.default(scopes=scopes)
+    creds.refresh(request)
+    return creds.id_token
+
 
 def generate_diagram_code_in_child_process(view: str) -> Tuple[Dict, List[str]]:
     def run_child_process():
         # Run a separate Python script as a child process
-        output = subprocess.check_output([sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view])
+        output = subprocess.check_output(
+            [sys.executable, "-m", "pystructurizr.generator", "dump", "--view", view])
         return output.decode().strip()
 
     # Run the child process and capture its output
@@ -22,9 +36,14 @@ def generate_diagram_code_in_child_process(view: str) -> Tuple[Dict, List[str]]:
 
 
 async def generate_svg(diagram_code: Dict, tmp_folder: str) -> str:
-    url = "https://kroki.io/structurizr/svg"
+
     async with httpx.AsyncClient() as client:
-        resp = await client.post(url, data=diagram_code)
+        if "run.app" in URL:
+            # Use Google Cloud Run's authentication mechanism
+            headers = {"Authorization": f"Bearer {_get_token()}"}
+        else:
+            headers = {}
+        resp = await client.post(URL, data=diagram_code, headers=headers)
 
     if resp.status_code != 200:
         print(resp)
